@@ -1,0 +1,145 @@
+{
+  "version": "0.1.0",
+  "name": "token_purchase",
+  "instructions": [
+    {
+      "name": "createPurchaseTransaction",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "communityMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "adminTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "realm",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "realmConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "governingTokenHolding",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "governanceTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenOwnerRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "governanceProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "solAmount",
+          "type": "u64"
+        },
+        {
+          "name": "lockDurationMonths",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "completePurchase",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "solAmount",
+          "type": "u64"
+        },
+        {
+          "name": "lockDurationMonths",
+          "type": "u8"
+        },
+        {
+          "name": "transactionSignature",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidLockDuration",
+      "msg": "Invalid lock duration. Must be 1, 3, 6, or 12 months."
+    },
+    {
+      "code": 6001,
+      "name": "InvalidAmount",
+      "msg": "Invalid amount. Amount must be greater than 0."
+    },
+    {
+      "code": 6002,
+      "name": "InsufficientTreasuryBalance",
+      "msg": "Insufficient token balance in treasury."
+    }
+  ],
+  "metadata": {
+    "address": "9HgVgT5AQ9WdCcZPMgzG8j26892YBjvHFEFL33xk4tb7"
+  }
+}

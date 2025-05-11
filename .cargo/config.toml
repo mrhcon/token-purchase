@@ -1,0 +1,5 @@
+[build]
+rustflags = []
+
+[unstable]
+next-lockfile-bump = true

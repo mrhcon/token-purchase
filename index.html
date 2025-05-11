@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crossovr Token Purchase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-text {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .input-text input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .input-text a {
+            margin-left: 10px;
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .tab-link {
+            padding: 8px 15px;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .tab-link.active {
+            border: 1px solid #ddd;
+            border-bottom-color: white;
+            margin-bottom: -1px;
+            background-color: #f9f9f9;
+        }
+        .input-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .input-btn:hover {
+            background-color: #45a049;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        .alert-success {
+            color: #3c763d;
+            background-color: #dff0d8;
+            border-color: #d6e9c6;
+        }
+        .alert-danger {
+            color: #a94442;
+            background-color: #f2dede;
+            border-color: #ebccd1;
+        }
+        .alert-info {
+            color: #31708f;
+            background-color: #d9edf7;
+            border-color: #bce8f1;
+        }
+        .alert-warning {
+            color: #8a6d3b;
+            background-color: #fcf8e3;
+            border-color: #faebcc;
+        }
+        #wallet-status {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+        .wallet-connect-btn {
+            background-color: #007bff;
+            margin-bottom: 20px;
+        }
+        .wallet-connect-btn:hover {
+            background-color: #0069d9;
+        }
+        .purchase-history {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+        .purchase-card {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Crossovr Token Purchase</h2>
+        
+        <div id="wallet-status">Wallet: Not Connected</div>
+        <button class="input-btn wallet-connect-btn" id="connect-wallet-btn" onclick="connectWallet()">Connect Wallet</button>
+        
+        <div class="input-group">
+            <label>Lock Period:</label>
+            <div class="tabs">
+                <div class="tab-link active">1 Month</div>
+                <div class="tab-link">3 Months</div>
+                <div class="tab-link">6 Months</div>
+                <div class="tab-link">12 Months</div>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label>Amount (SOL):</label>
+            <div class="input-text">
+                <input type="text" placeholder="Enter amount...">
+                <a>Max</a>
+            </div>
+        </div>
+        
+        <button class="input-btn">Purchase Tokens</button>
+    </div>
+
+    <!-- Solana WebJS browser bundle - use a specific version -->
+    <script src="https://unpkg.com/@solana/web3.js@1.73.0/lib/index.iife.min.js"></script>
+
+    <!-- Global variable setup -->
+    <script>
+        window.solanaWeb3 = solanaWeb3;
+        console.log("Solana Web3 loaded:", typeof solanaWeb3 !== 'undefined');
+    </script>
+
+    <!-- Include wallet connection script -->
+    <script src="./assets/js/wallet.js"></script>
+
+    <!-- Include main JS -->
+    <script src="./assets/js/client.js"></script>
+    
+    <!-- Connect wallet button event listener -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get connect wallet button and add event listener
+            const connectWalletBtn = document.getElementById('connect-wallet-btn');
+            if (connectWalletBtn) {
+                connectWalletBtn.addEventListener('click', function() {
+                    if (typeof connectWallet === 'function') {
+                        connectWallet();
+                    } else {
+                        console.error('connectWallet function is not defined');
+                        alert('Wallet connection not available. Please check your browser console for details.');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

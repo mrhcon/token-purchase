@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phantom Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        button { padding: 10px 15px; margin: 10px 0; cursor: pointer; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 4px; overflow: auto; }
+        .log { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Phantom Wallet Debug</h1>
+    
+    <div>
+        <button id="check-btn">Check Wallet</button>
+        <button id="connect-btn">Connect Wallet</button>
+        <button id="disconnect-btn">Disconnect Wallet</button>
+    </div>
+    
+    <div class="log">
+        <h3>Log:</h3>
+        <pre id="log"></pre>
+    </div>
+    
+    <script>
+        const logEl = document.getElementById('log');
+        
+        function log(message) {
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            logEl.textContent += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+        
+        document.getElementById('check-btn').addEventListener('click', () => {
+            log('Checking wallet...');
+            
+            if (typeof window.solana !== 'undefined') {
+                log(`Wallet detected: ${window.solana.isPhantom ? 'Phantom' : 'Unknown'}`);
+                log(`Properties: ${Object.getOwnPropertyNames(window.solana).join(', ')}`);
+                log(`Is connected: ${window.solana.isConnected}`);
+                if (window.solana.isConnected) {
+                    log(`Public key: ${window.solana.publicKey ? window.solana.publicKey.toString() : 'unknown'}`);
+                }
+            } else {
+                log('No wallet detected in window.solana');
+                
+                // Check for other wallet providers
+                const providers = [];
+                for (const key in window) {
+                    if (
+                        key.includes('solana') || 
+                        key.includes('wallet') || 
+                        (window[key] && typeof window[key] === 'object' && window[key].isPhantom)
+                    ) {
+                        providers.push(key);
+                    }
+                }
+                
+                if (providers.length > 0) {
+                    log(`Found potential wallet providers: ${providers.join(', ')}`);
+                } else {
+                    log('No wallet providers found');
+                }
+            }
+        });
+        
+        document.getElementById('connect-btn').addEventListener('click', async () => {
+            log('Attempting to connect...');
+            
+            if (typeof window.solana === 'undefined') {
+                log('No wallet detected!');
+                return;
+            }
+            
+            try {
+                if (window.solana.connect) {
+                    log('Using solana.connect()...');
+                    const resp = await window.solana.connect();
+                    log(`Connected via connect(): ${resp.publicKey.toString()}`);
+                } else if (window.solana.request) {
+                    log('Using solana.request({ method: "connect" })...');
+                    const resp = await window.solana.request({ method: "connect" });
+                    log(`Connected via request(): ${JSON.stringify(resp)}`);
+                    log(`Public key: ${window.solana.publicKey ? window.solana.publicKey.toString() : 'unknown'}`);
+                } else {
+                    log('No connect method available!');
+                }
+            } catch (err) {
+                log(`Connection error: ${err.message}`);
+            }
+        });
+        
+        document.getElementById('disconnect-btn').addEventListener('click', async () => {
+            log('Attempting to disconnect...');
+            
+            if (typeof window.solana === 'undefined') {
+                log('No wallet detected!');
+                return;
+            }
+            
+            try {
+                if (window.solana.disconnect) {
+                    await window.solana.disconnect();
+                    log('Disconnected via disconnect()');
+                } else if (window.solana.request) {
+                    await window.solana.request({ method: "disconnect" });
+                    log('Disconnected via request()');
+                } else {
+                    log('No disconnect method available!');
+                }
+            } catch (err) {
+                log(`Disconnect error: ${err.message}`);
+            }
+        });
+        
+        // Initial check
+        window.addEventListener('load', () => {
+            log('Page loaded');
+            
+            setTimeout(() => {
+                if (typeof window.solana !== 'undefined') {
+                    log(`Wallet detected on load: ${window.solana.isPhantom ? 'Phantom' : 'Unknown'}`);
+                    log(`Is connected on load: ${window.solana.isConnected}`);
+                } else {
+                    log('No wallet detected on load');
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

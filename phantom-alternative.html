@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phantom Alternative Method</title>
+    <script src="https://unpkg.com/@solana/web3.js@1.73.0/lib/index.iife.min.js"></script>
+</head>
+<body>
+    <h1>Phantom Alternative Connection Method</h1>
+    <button id="connect">Connect to Phantom</button>
+    <div id="status">Not connected</div>
+    
+    <script>
+        document.getElementById('connect').addEventListener('click', async function() {
+            try {
+                // Attempt to get the phantom wallet from either the phantom property
+                // or the solana property, depending on what's available
+                let wallet = null;
+                
+                // Method 1: Check window.phantom
+                if (window.phantom && window.phantom.solana) {
+                    console.log("Found phantom.solana");
+                    wallet = window.phantom.solana;
+                } 
+                // Method 2: Check for window.solana
+                else if (window.solana && window.solana.isPhantom) {
+                    console.log("Found solana with isPhantom=true");
+                    wallet = window.solana;
+                }
+                
+                if (!wallet) {
+                    console.error("No Phantom wallet found in either location");
+                    document.getElementById('status').textContent = "Phantom wallet not detected. Please install Phantom wallet.";
+                    return;
+                }
+                
+                console.log("Wallet found, attempting connect...");
+                document.getElementById('status').textContent = "Connecting to Phantom...";
+                
+                // Use a try-catch for the connection attempt
+                try {
+                    const resp = await wallet.connect();
+                    document.getElementById('status').textContent = "Connected: " + resp.publicKey.toString();
+                    console.log("Connected:", resp.publicKey.toString());
+                } catch (connErr) {
+                    console.error("Connect error:", connErr);
+                    document.getElementById('status').textContent = "Connection error: " + connErr.message;
+                }
+            } catch (err) {
+                console.error("Error:", err);
+                document.getElementById('status').textContent = "Error: " + err.message;
+            }
+        });
+    </script>
+</body>
+</html>

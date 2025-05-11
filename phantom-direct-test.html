@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phantom Direct Connection Test</title>
+    <script src="https://unpkg.com/@solana/web3.js@1.73.0/lib/index.iife.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            background-color: #512da8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #311b92;
+        }
+        #status {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Phantom Direct Connection Test</h1>
+    
+    <div id="status">Status: Ready to test</div>
+    
+    <button id="detect-btn">Detect Phantom</button>
+    <button id="connect-btn">Connect Wallet</button>
+    <button id="getBalance-btn" disabled>Get Balance</button>
+    
+    <script>
+        const statusEl = document.getElementById('status');
+        const detectBtn = document.getElementById('detect-btn');
+        const connectBtn = document.getElementById('connect-btn');
+        const getBalanceBtn = document.getElementById('getBalance-btn');
+        
+        let publicKey = null;
+        
+        function updateStatus(message, isError = false) {
+            statusEl.textContent = message;
+            statusEl.className = isError ? 'error' : 'success';
+            console.log(message);
+        }
+        
+        function getProvider() {
+            if ('phantom' in window) {
+                const provider = window.phantom?.solana;
+                if (provider?.isPhantom) {
+                    return provider;
+                }
+            }
+            return null;
+        }
+        
+        // Detect Phantom
+        detectBtn.addEventListener('click', function() {
+            const provider = getProvider();
+            if (provider) {
+                updateStatus(`Phantom detected! isConnected: ${provider.isConnected}`);
+            } else {
+                updateStatus('Phantom not detected. Please install Phantom wallet extension.', true);
+                window.open('https://phantom.app/', '_blank');
+            }
+        });
+        
+        // Connect to wallet
+        connectBtn.addEventListener('click', async function() {
+            try {
+                const provider = getProvider();
+                if (!provider) {
+                    updateStatus('Phantom not detected. Please install Phantom wallet extension.', true);
+                    return;
+                }
+                
+                updateStatus('Requesting connection...');
+                
+                try {
+                    const resp = await provider.connect();
+                    publicKey = resp.publicKey.toString();
+                    updateStatus(`Connected to wallet: ${publicKey}`);
+                    getBalanceBtn.disabled = false;
+                } catch (err) {
+                    updateStatus(`Connection error: ${err.message}`, true);
+                }
+            } catch (err) {
+                updateStatus(`Unexpected error: ${err.message}`, true);
+            }
+        });
+        
+        // Get wallet balance
+        getBalanceBtn.addEventListener('click', async function() {
+            try {
+                if (!publicKey) {
+                    updateStatus('Not connected to a wallet.', true);
+                    return;
+                }
+                
+                updateStatus('Getting balance...');
+                
+                const connection = new solanaWeb3.Connection('https://api.devnet.solana.com');
+                const publicKeyObj = new solanaWeb3.PublicKey(publicKey);
+                const balance = await connection.getBalance(publicKeyObj);
+                
+                updateStatus(`Balance: ${balance / 1000000000} SOL (DevNet)`);
+            } catch (err) {
+                updateStatus(`Error getting balance: ${err.message}`, true);
+            }
+        });
+        
+        // Check for Phantom on page load
+        window.addEventListener('load', function() {
+            const provider = getProvider();
+            if (provider) {
+                updateStatus(`Phantom detected on load! isConnected: ${provider.isConnected}`);
+                
+                // If already connected, update UI
+                if (provider.isConnected && provider.publicKey) {
+                    publicKey = provider.publicKey.toString();
+                    updateStatus(`Already connected to wallet: ${publicKey}`);
+                    getBalanceBtn.disabled = false;
+                }
+            } else {
+                updateStatus('Phantom not detected. Please install Phantom wallet extension.', true);
+            }
+        });
+    </script>
+</body>
+</html>

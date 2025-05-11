@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phantom Wallet Test</title>
+    <script src="https://unpkg.com/@solana/web3.js@1.73.0/lib/index.iife.min.js"></script>
+    <script>
+        window.solanaWeb3 = solanaWeb3;
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px 0; font-size: 16px; cursor: pointer; }
+        pre { background: #f4f4f4; padding: 10px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>Phantom Wallet Connection Test</h1>
+    <div id="status">Status: Ready to test</div>
+    <button id="check-btn">Check Wallet</button>
+    <button id="connect-btn">Connect Wallet (Direct)</button>
+    <button id="connect-btn2">Connect Wallet (Alternative)</button>
+    <button id="refresh-page">Refresh Page</button>
+    
+    <div>
+        <h3>Debug Output:</h3>
+        <pre id="debug"></pre>
+    </div>
+
+    <script>
+        // Debug logging utility
+        function debug(message) {
+            const el = document.getElementById('debug');
+            el.textContent += message + '\n';
+            console.log(message);
+        }
+        
+        // Set status
+        function setStatus(message) {
+            document.getElementById('status').textContent = "Status: " + message;
+            debug("Status changed: " + message);
+        }
+        
+        // Check wallet
+        document.getElementById('check-btn').addEventListener('click', () => {
+            setStatus("Checking wallet...");
+            
+            if (typeof window.solana !== 'undefined') {
+                debug("Wallet found: " + (window.solana.isPhantom ? "Phantom" : "Unknown type"));
+                debug("Connected: " + window.solana.isConnected);
+                
+                if (window.solana.isConnected && window.solana.publicKey) {
+                    debug("Public key: " + window.solana.publicKey.toString());
+                }
+                
+                setStatus("Wallet checked - see debug output");
+            } else {
+                debug("No wallet found in window.solana");
+                setStatus("No wallet detected");
+            }
+        });
+        
+        // Connect directly 
+        document.getElementById('connect-btn').addEventListener('click', async () => {
+            setStatus("Connecting (direct method)...");
+            
+            if (typeof window.solana === 'undefined') {
+                debug("No wallet found!");
+                setStatus("No wallet detected");
+                return;
+            }
+            
+            try {
+                debug("Calling window.solana.connect()...");
+                const resp = await window.solana.connect();
+                debug("Connect response received!");
+                debug("Connected to: " + resp.publicKey.toString());
+                setStatus("Connected successfully");
+            } catch (err) {
+                debug("Connection error: " + (err.message || err));
+                setStatus("Connection failed");
+            }
+        });
+        
+        // Connect alternative
+        document.getElementById('connect-btn2').addEventListener('click', async () => {
+            setStatus("Connecting (alternative method)...");
+            
+            if (typeof window.solana === 'undefined') {
+                debug("No wallet found!");
+                setStatus("No wallet detected");
+                return;
+            }
+            
+            try {
+                debug("Using request method...");
+                const resp = await window.solana.request({ method: "connect" });
+                debug("Request response received!");
+                debug("Connected status: " + window.solana.isConnected);
+                
+                if (window.solana.publicKey) {
+                    debug("Public key: " + window.solana.publicKey.toString());
+                    setStatus("Connected successfully");
+                } else {
+                    debug("No public key available after connection");
+                    setStatus("Connection incomplete");
+                }
+            } catch (err) {
+                debug("Connection error: " + (err.message || err));
+                setStatus("Connection failed");
+            }
+        });
+        
+        // Refresh button
+        document.getElementById('refresh-page').addEventListener('click', () => {
+            window.location.reload();
+        });
+        
+        // Initial check on page load
+        window.addEventListener('load', () => {
+            debug("Page loaded at " + new Date().toLocaleTimeString());
+            
+            setTimeout(() => {
+                if (typeof window.solana !== 'undefined') {
+                    debug("Wallet detected on load: " + (window.solana.isPhantom ? "Phantom" : "Unknown"));
+                    debug("Is connected on load: " + window.solana.isConnected);
+                    
+                    if (window.solana.isConnected && window.solana.publicKey) {
+                        debug("Already connected to: " + window.solana.publicKey.toString());
+                        setStatus("Already connected");
+                    } else {
+                        setStatus("Wallet detected (not connected)");
+                    }
+                } else {
+                    debug("No wallet detected on page load");
+                    setStatus("No wallet detected");
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>
