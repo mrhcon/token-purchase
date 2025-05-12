@@ -269,25 +269,34 @@ app.post('/api/create-purchase-transaction', async (req, res) => {
             console.log('- governanceTokenAccount:', governanceAddresses.governanceTokenAccount.toString());
             console.log('- tokenOwnerRecord:', governanceAddresses.tokenOwnerRecord.toString());
 
-            console.log("All accounts for createPurchaseTransaction:");
-            console.log("- user:", new PublicKey(walletAddress).toString());
-            console.log("- admin:", adminKeypair.publicKey.toString());
-            console.log("- treasury:", treasury.toString());
-            console.log("- communityMint:", communityMintPubkey.toString());
-            console.log("- adminTokenAccount:", adminTokenAccount.toString());
-            console.log("- userTokenAccount:", userTokenAccount.toString());
-            console.log("- realm:", realmPubkey.toString());
-            console.log("- realmConfig:", realmConfig.toString());
-            console.log("- governingTokenHolding:", governingTokenHolding.toString());
-            console.log("- governanceTokenAccount:", governanceTokenAccount.toString());
-            console.log("- tokenOwnerRecord:", tokenOwnerRecord.toString());
-            console.log("- systemProgram:", SystemProgram.programId.toString());
-            console.log("- tokenProgram:", TOKEN_PROGRAM_ID.toString());
-            console.log("- associatedTokenProgram:", ASSOCIATED_TOKEN_PROGRAM_ID.toString());
-            console.log("- governanceProgram:", governanceProgramId.toString());
-
             // Check available program methods
             console.log('Available program methods:', Object.keys(program.methods));
+
+// Add this right before your transaction creation code
+console.log("Transaction accounts:", JSON.stringify({
+  // Copy the exact accounts object from your code
+	                        user: senderPubkey,
+                        admin: adminWallet.publicKey,
+                        treasury: treasuryPubkey,
+                        communityMint: communityMintPubkey,
+                        adminTokenAccount: adminTokenAccount,
+                        userTokenAccount: userTokenAccount,
+                        realm: realmPubkey,
+                        realmConfig: governanceAddresses.realmConfig,
+                        governingTokenHolding: governanceAddresses.governingTokenHolding,
+                        governanceTokenAccount: governanceAddresses.governanceTokenAccount,
+                        tokenOwnerRecord: governanceAddresses.tokenOwnerRecord,
+                        systemProgram: SystemProgram.programId,
+                        tokenProgram: TOKEN_PROGRAM_ID,
+                        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+                        governanceProgram: governanceProgramId
+
+}, (key, value) => {
+  if (value && typeof value === 'object' && value.constructor && value.constructor.name === 'PublicKey') {
+    return value.toString();
+  }
+  return value;
+}));
 
             // Create the transaction using the correct method from IDL
             let tx;
