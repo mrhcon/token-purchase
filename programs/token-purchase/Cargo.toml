@@ -20,3 +20,9 @@ init-if-needed = []  # Add this feature
 anchor-lang = { version = "0.28.0", features = ["init-if-needed"] }
 anchor-spl = "0.28.0"
 solana-program = "=1.16.0"  # Pin to a specific version
+
+[profile.release]
+overflow-checks = true
+lto = "fat"
+codegen-units = 1
+opt-level = 3

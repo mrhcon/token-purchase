@@ -3,7 +3,7 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
-token_purchase = "9HgVgT5AQ9WdCcZPMgzG8j26892YBjvHFEFL33xk4tb7"
+token_purchase = "7665eSzakhgZKF1j9AX9mc2mstwLsk7qE5ZvX3SWNtRH"
 
 [registry]
 url = "https://api.apr.dev"
@@ -21,3 +21,6 @@ treasury_address = "4WpsT2QvtjuYh4y9ggDRBPVDJseF98f26ke3DSXptCXt"
 governance_program_id = "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw"
 realm_id = "5Zjr7Be8fdrbfG9B2uZYxqyrwawFBpPy1Zkgd3RxwEUk"
 community_mint = "JCTnoqWEEoWz4cBuPEF6KgK1Zc8YyBoHSm5u2FBQvHHA"
+
+[build]
+rustflags = ["-C", "link-arg=--stack-first", "-C", "link-arg=-z", "-C", "link-arg=stack-size=65536"]
